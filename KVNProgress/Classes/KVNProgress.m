@@ -1066,6 +1066,24 @@ static KVNProgressConfiguration *configuration;
 	}
 }
 
++ (void)updateTitle:(NSString *)title status:(NSString*)status {
+    [[self sharedView] updateTitle:title status:status];
+
+}
+- (void)updateTitle:(NSString *)title status:(NSString*)status {
+    if ([self.class isVisible]) {
+        [UIView animateWithDuration:KVNLayoutAnimationDuration
+                         animations:^{
+                             [self setupStatus:status];
+                             [self setupTitle:title];
+                         }];
+    } else {
+        [self setupStatus:status];
+        [self setupTitle:title];
+  }
+
+}
+
 + (void)updateStatus:(NSString*)status
 {
 	[[self sharedView] updateStatus:status];

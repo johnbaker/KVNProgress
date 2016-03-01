@@ -228,6 +228,15 @@ typedef void (^KVNCompletionBlock)(void);
 #pragma mark - Update
 
 /**
+Changes the loading title while HUD is displayed.
+Nothing happens when progress view is not displayed.
+ @param title The title to show
+ @param status The status to show
+*/
++ (void)updateTitle:(NSString *)title status:(NSString*)status;
+
+
+/**
  Changes the loading status while HUD is displayed.
  Nothing happens when progress view is not displayed.
  @param status The status to show
