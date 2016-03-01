@@ -1128,6 +1128,10 @@ static KVNProgressConfiguration *configuration;
 - (void)updateProgress:(CGFloat)progress
 			  animated:(BOOL)animated
 {
+    if(progress == self.progress) {
+        return;
+    }
+    
 	if (self.style != KVNProgressStyleProgress) {
 		return;
 	}
