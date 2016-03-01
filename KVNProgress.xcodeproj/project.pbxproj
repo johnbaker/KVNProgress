@@ -268,6 +268,7 @@
 				0AA0DD051930DFAD00FDD29F /* Frameworks */,
 				0AA0DD061930DFAD00FDD29F /* Resources */,
 				D038DBEA28BFEA2790CC1FD6 /* Copy Pods Resources */,
+				4683A1FDFEF1BA4D96B6C263 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -366,6 +367,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "bundleVersion=$(git --git-dir=\"${PROJECT_DIR}/.git\" --work-tree=\"${PROJECT_DIR}\" rev-list HEAD | wc -l)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bundleVersion\" \"${PROJECT_DIR}/${PROJECT_NAME}/KVNProgress-Info.plist\"";
+		};
+		4683A1FDFEF1BA4D96B6C263 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KVNProgressTests/Pods-KVNProgressTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		D038DBEA28BFEA2790CC1FD6 /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;

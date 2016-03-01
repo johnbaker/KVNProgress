@@ -58,6 +58,7 @@ static KVNProgressConfiguration *configuration;
 
 @property (nonatomic) CGFloat progress;
 @property (nonatomic) KVNProgressBackgroundType backgroundType;
+@property (nonatomic) NSString *title;
 @property (nonatomic) NSString *status;
 @property (nonatomic) KVNProgressStyle style;
 @property (nonatomic) KVNProgressConfiguration *configuration;
@@ -70,6 +71,7 @@ static KVNProgressConfiguration *configuration;
 @property (nonatomic, weak) IBOutlet UIImageView *contentView;
 @property (nonatomic, weak) IBOutlet UIView *circleProgressView;
 @property (nonatomic, weak) IBOutlet UILabel *statusLabel;
+@property (nonatomic, weak) IBOutlet UILabel *titleLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *backgroundImageView;
 
 @property (nonatomic, strong) CAShapeLayer *checkmarkLayer;
@@ -85,9 +87,12 @@ static KVNProgressConfiguration *configuration;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *circleProgressViewHeightConstraint;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *circleProgressViewToStatusLabelVerticalSpaceConstraint;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *circleProgressViewTopToSuperViewConstraint;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *statusLabelBottomToSuperViewConstraint;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *statusLabelToTitleVerticalSpaceConstraint;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *titleLabelHeightConstraint;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *titleLabelToSpaceToSuperViewConstraint;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *circleProgressViewBottomToSuperViewConstraint;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *contentViewWidthConstraint;
+
 
 @property (nonatomic) NSArray *constraintsToSuperview;
 
@@ -199,11 +204,7 @@ static KVNProgressConfiguration *configuration;
 + (void)showWithStatus:(NSString *)status
 				onView:(UIView *)superview
 {
-	[self showHUDWithProgress:KVNProgressIndeterminate
-						style:KVNProgressStyleProgress
-					   status:status
-					superview:superview
-				   completion:nil];
+    [self  showWithTitle:nil status:status onView:superview];
 }
 
 #pragma mark - Progress
@@ -226,11 +227,53 @@ static KVNProgressConfiguration *configuration;
 			  status:(NSString *)status
 			  onView:(UIView *)superview
 {
-	[self showHUDWithProgress:progress
-						style:KVNProgressStyleProgress
-					   status:status
-					superview:superview
-				   completion:nil];
+    [self showProgress:progress title:nil status:status onView:superview];
+}
+
+#pragma  mark - jbaker
+
+#pragma mark - jbaker
+
+
++ (void)showWithTitle:(NSString *)title status:(NSString *)status {
+    [self showWithTitle:title status:status onView:nil];
+}
+
++ (void)showWithTitle:(NSString *)title {
+    [self showWithTitle:title status:nil onView:nil];
+}
+
++ (void)showWithTitle:(NSString *)title status:(NSString *)status
+               onView:(UIView *)superview {
+   	[self showHUDWithProgress:KVNProgressIndeterminate
+                        style:KVNProgressStyleProgress
+                        title:title
+                       status:status
+                    superview:superview
+                   completion:nil];
+}
+
++ (void)showProgress:(CGFloat)progress
+               title:(NSString *)title {
+    [self showProgress:progress title:title status:nil];
+}
+
++ (void)showProgress:(CGFloat)progress
+               title:(NSString *)title
+              status:(NSString*)status {
+    [self showProgress:progress title:title status:status onView:nil];
+}
+
++ (void)showProgress:(CGFloat)progress
+               title:(NSString *)title
+              status:(NSString*)status
+              onView:(UIView *)superview {
+    [self showHUDWithProgress:progress
+                        style:KVNProgressStyleProgress
+                        title:title
+                       status:status
+                    superview:superview
+                   completion:nil];
 }
 
 #pragma mark - Success
@@ -274,7 +317,8 @@ static KVNProgressConfiguration *configuration;
 {
 	[self showHUDWithProgress:KVNProgressIndeterminate
 						style:KVNProgressStyleSuccess
-					   status:status
+                        title:nil
+                       status:status
 					superview:superview
 				   completion:completion];
 }
@@ -320,7 +364,8 @@ static KVNProgressConfiguration *configuration;
 {
 	[self showHUDWithProgress:KVNProgressIndeterminate
 						style:KVNProgressStyleError
-					   status:status
+                        title:nil
+                       status:status
 					superview:superview
 				   completion:completion];
 }
@@ -329,11 +374,13 @@ static KVNProgressConfiguration *configuration;
 
 + (void)showHUDWithProgress:(CGFloat)progress
 					  style:(KVNProgressStyle)style
-					 status:(NSString *)status
+                     title:(NSString *)title
+                     status:(NSString *)status
 				  superview:(UIView *)superview
 				 completion:(KVNCompletionBlock)completion
 {
 	[[self sharedView] showProgress:progress
+                              title:title
 							 status:status
 							  style:style
 					 backgroundType:configuration.backgroundType
@@ -343,6 +390,7 @@ static KVNProgressConfiguration *configuration;
 }
 
 - (void)showProgress:(CGFloat)progress
+               title:(NSString *)title
 			  status:(NSString *)status
 			   style:(KVNProgressStyle)style
 	  backgroundType:(KVNProgressBackgroundType)backgroundType
@@ -381,6 +429,7 @@ static KVNProgressConfiguration *configuration;
 				}
 				
 				[KVNBlockSelf showProgress:progress
+                                     title:title
 									status:status
 									 style:style
 							backgroundType:backgroundType
@@ -396,6 +445,7 @@ static KVNProgressConfiguration *configuration;
 	// We're going to create a new HUD
 	self.waitingToChangeHUD = NO;
 	self.progress = progress;
+    self.title = [title copy];
 	self.status = [status copy];
 	self.style = style;
 	self.backgroundType = backgroundType;
@@ -558,7 +608,8 @@ static KVNProgressConfiguration *configuration;
 	[self setupGestures];
 	[self setupConstraints];
 	[self setupCircleProgressView];
-	[self setupStatus:self.status];
+    [self setupTitle:self.title];
+    [self setupStatus:self.status];
 	[self setupBackground];
 }
 
@@ -600,7 +651,7 @@ static KVNProgressConfiguration *configuration;
 - (void)setupConstraints
 {
 	CGRect bounds = [self correctedBounds];
-	CGFloat statusInset = (self.status.length > 0) ? KVNContentViewWithStatusInset : KVNContentViewWithoutStatusInset;
+    CGFloat titleInset = (self.title.length > 0) ? KVNContentViewWithStatusInset : KVNContentViewWithoutStatusInset;
 	CGFloat contentWidth;
 	
 	if (!KVNSystemVersionGreaterOrEqual_iOS_8 && [self.superview isKindOfClass:UIWindow.class]) {
@@ -623,8 +674,8 @@ static KVNProgressConfiguration *configuration;
 		}
 	}
 	
-	self.circleProgressViewTopToSuperViewConstraint.constant = statusInset;
-	self.statusLabelBottomToSuperViewConstraint.constant = statusInset;
+    self.circleProgressViewBottomToSuperViewConstraint.constant = titleInset;
+	self.titleLabelToSpaceToSuperViewConstraint.constant = titleInset;
 	self.contentViewWidthConstraint.constant = contentWidth;
 	
 	[self layoutIfNeeded];
@@ -815,6 +866,26 @@ static KVNProgressConfiguration *configuration;
 	self.circleProgressLineLayer.lineWidth = self.configuration.lineWidth;
 }
 
+- (void)setupTitle:(NSString *)title
+{
+    self.title = title;
+    
+    BOOL showTitle = (self.title.length > 0);
+    
+    CATransition *animation = [CATransition animation];
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    animation.type = kCATransitionFade;
+    animation.duration = KVNTextUpdateAnimationDuration;
+    [self.titleLabel.layer addAnimation:animation forKey:@"kCATransitionFade"];
+    
+    self.titleLabel.text = self.title;
+    self.titleLabel.textColor = self.configuration.titleColor;
+    self.titleLabel.font = self.configuration.titleFont;
+    self.titleLabel.hidden = !showTitle;
+    
+    [self updateStatusConstraints];
+}
+
 - (void)setupStatus:(NSString *)status
 {
 	self.status = status;
@@ -986,8 +1057,8 @@ static KVNProgressConfiguration *configuration;
 - (void)updateBackgroundConstraints
 {
 	if (![self isFullScreen] && self.status.length == 0) {
-		self.circleProgressViewTopToSuperViewConstraint.constant = KVNContentViewWithoutStatusInset;
-		self.statusLabelBottomToSuperViewConstraint.constant = KVNContentViewWithoutStatusInset;
+        self.circleProgressViewBottomToSuperViewConstraint.constant  = KVNContentViewWithoutStatusInset;
+        self.titleLabelToSpaceToSuperViewConstraint.constant = KVNContentViewWithoutStatusInset;
 		
 		// We sets the width as the height to have a square
 		CGSize fittingSize = [self.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
@@ -1012,16 +1083,38 @@ static KVNProgressConfiguration *configuration;
 	}
 }
 
++ (void)updateTitle:(NSString*)title
+{
+    [[self sharedView] updateTitle:title];
+}
+
+- (void)updateTitle:(NSString *)title
+{
+    if ([self.class isVisible]) {
+        [UIView animateWithDuration:KVNLayoutAnimationDuration
+                         animations:^{
+                             [self setupTitle:title];
+                         }];
+    } else {
+        [self setupTitle:title];
+    }
+}
+
 - (void)updateStatusConstraints
 {
-	BOOL showStatus = (self.status.length > 0);
+    BOOL showTitle = (self.title.length > 0);
+    BOOL showStatus = (self.status.length > 0);
 	
-	self.circleProgressViewToStatusLabelVerticalSpaceConstraint.constant = (showStatus) ? KVNCircleProgressViewToStatusLabelVerticalSpaceConstraintConstant : 0.0f;
+	self.circleProgressViewToStatusLabelVerticalSpaceConstraint.constant = (showStatus || showTitle) ? KVNCircleProgressViewToStatusLabelVerticalSpaceConstraintConstant : 0.0f;
 	
 	CGSize maximumLabelSize = CGSizeMake(CGRectGetWidth(self.statusLabel.bounds), CGFLOAT_MAX);
 	CGSize statusLabelSize = [self.statusLabel sizeThatFits:maximumLabelSize];
 	self.statusLabelHeightConstraint.constant = statusLabelSize.height;
-	
+    
+    maximumLabelSize = CGSizeMake(CGRectGetWidth(self.titleLabel.bounds), CGFLOAT_MAX);
+    CGSize titleLabelSize = [self.titleLabel sizeThatFits:maximumLabelSize];
+    self.titleLabelHeightConstraint.constant = titleLabelSize.height;
+
 	[self layoutIfNeeded];
 }
 
@@ -1042,6 +1135,7 @@ static KVNProgressConfiguration *configuration;
 	if ([self isIndeterminate]) {
 		// was inderminate
 		[self showProgress:progress
+                     title:self.title
 					status:self.status
 					 style:self.style
 			backgroundType:self.backgroundType

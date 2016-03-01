@@ -56,6 +56,13 @@ typedef NS_ENUM(NSUInteger, KVNProgressBackgroundType) {
 /** Width of the circle stroke line. */
 @property (nonatomic, assign) CGFloat lineWidth;
 
+#pragma mark - Title
+
+/** Color of the status label. */
+@property (nonatomic, strong) UIColor *titleColor;
+/** Font of the status label. */
+@property (nonatomic, strong) UIFont *titleFont;
+
 #pragma mark - Status
 
 /** Color of the status label. */

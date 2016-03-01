@@ -71,6 +71,58 @@ typedef void (^KVNCompletionBlock)(void);
 			  status:(NSString*)status
 			  onView:(UIView *)superview;
 
+
+#pragma mark - jbaker
+
+/**
+ Shows an indeterminate progress view with the <code>status</code>.
+ @param title The title to show.
+ @param status The status to show.
+ */
++ (void)showWithTitle:(NSString *)title status:(NSString *)status;
+/**
+ Shows an indeterminate progress view with the <code>status</code>.
+ @param title The title to show.
+ */
++ (void)showWithTitle:(NSString *)title;
+/**
+ Shows an indeterminate progress view with the <code>status</code>.
+ @param title The title to show.
+ @param status The status to show.
+ @param superview The superview on which to add the progress view. Pass <code>nil</code> to add to main window.
+ 
+ */
++ (void)showWithTitle:(NSString *)title status:(NSString *)status
+               onView:(UIView *)superview;
+
+/**
+ Shows a progress view with a specified <code>progress</code> and <code>status</code>.
+ @param title The title to show.
+ */
++ (void)showProgress:(CGFloat)progress
+               title:(NSString *)title;
+
+/**
+ Shows a progress view with a specified <code>progress</code> and <code>status</code>.
+ @param status The status to show.
+ @param title The title to show.
+ */
++ (void)showProgress:(CGFloat)progress
+               title:(NSString *)title
+              status:(NSString*)status;
+
+/**
+ Shows a progress view added to <code>superview</code> with a specified <code>progress</code> and <code>status</code>.
+ @param status The status to show.
+ @param title The title to show.
+ @param superview The superview on which to add the progress view. Pass <code>nil</code> to add to main window.
+ */
++ (void)showProgress:(CGFloat)progress
+               title:(NSString *)title
+              status:(NSString*)status
+              onView:(UIView *)superview;
+
+
 #pragma mark - Success
 
 /** Shows a success view without status. */

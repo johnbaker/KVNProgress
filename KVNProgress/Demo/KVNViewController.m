@@ -111,7 +111,7 @@
 
 - (IBAction)showProgress
 {
-	[KVNProgress showProgress:0.0f
+	[KVNProgress showWithTitle:@"Loading"
 					   status:@"Loading with progress..."];
 	
 	[self updateProgress];
